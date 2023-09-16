@@ -31,7 +31,7 @@ func (h Handler) Handle(w http.ResponseWriter, req *http.Request) {
 
 	switch req.Method {
 	case http.MethodGet:
-		v, err := h.ctrl.GetAggregateRating(req.Context(), recordID, recordType)
+		v, err := h.ctrl.GetAggregatedRating(req.Context(), recordID, recordType)
 		if err != nil && errors.Is(err, rating.ErrNotFound) {
 			w.WriteHeader(http.StatusNotFound)
 			return
@@ -46,7 +46,7 @@ func (h Handler) Handle(w http.ResponseWriter, req *http.Request) {
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
-		if err = h.ctrl.Put(req.Context(), recordID, recordType,
+		if err = h.ctrl.PutRating(req.Context(), recordID, recordType,
 			&model.Rating{
 				UserID: userID,
 				Value:  model.RatingValue(v)},
