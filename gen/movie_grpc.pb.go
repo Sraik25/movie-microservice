@@ -19,15 +19,15 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	MetadataService_GetMetadata_FullMethodName = "/MetadataService/GetMetadata"
-	MetadataService_PutMetadata_FullMethodName = "/MetadataService/PutMetadata"
+	MetadataService_GetMetadataByID_FullMethodName = "/MetadataService/GetMetadataByID"
+	MetadataService_PutMetadata_FullMethodName     = "/MetadataService/PutMetadata"
 )
 
 // MetadataServiceClient is the client API for MetadataService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type MetadataServiceClient interface {
-	GetMetadata(ctx context.Context, in *GetMetadataRequest, opts ...grpc.CallOption) (*GetMetadataResponse, error)
+	GetMetadataByID(ctx context.Context, in *GetMetadataRequest, opts ...grpc.CallOption) (*GetMetadataResponse, error)
 	PutMetadata(ctx context.Context, in *PutMetadataRequest, opts ...grpc.CallOption) (*PutMetadataResponse, error)
 }
 
@@ -39,9 +39,9 @@ func NewMetadataServiceClient(cc grpc.ClientConnInterface) MetadataServiceClient
 	return &metadataServiceClient{cc}
 }
 
-func (c *metadataServiceClient) GetMetadata(ctx context.Context, in *GetMetadataRequest, opts ...grpc.CallOption) (*GetMetadataResponse, error) {
+func (c *metadataServiceClient) GetMetadataByID(ctx context.Context, in *GetMetadataRequest, opts ...grpc.CallOption) (*GetMetadataResponse, error) {
 	out := new(GetMetadataResponse)
-	err := c.cc.Invoke(ctx, MetadataService_GetMetadata_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, MetadataService_GetMetadataByID_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -61,7 +61,7 @@ func (c *metadataServiceClient) PutMetadata(ctx context.Context, in *PutMetadata
 // All implementations must embed UnimplementedMetadataServiceServer
 // for forward compatibility
 type MetadataServiceServer interface {
-	GetMetadata(context.Context, *GetMetadataRequest) (*GetMetadataResponse, error)
+	GetMetadataByID(context.Context, *GetMetadataRequest) (*GetMetadataResponse, error)
 	PutMetadata(context.Context, *PutMetadataRequest) (*PutMetadataResponse, error)
 	mustEmbedUnimplementedMetadataServiceServer()
 }
@@ -70,8 +70,8 @@ type MetadataServiceServer interface {
 type UnimplementedMetadataServiceServer struct {
 }
 
-func (UnimplementedMetadataServiceServer) GetMetadata(context.Context, *GetMetadataRequest) (*GetMetadataResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetMetadata not implemented")
+func (UnimplementedMetadataServiceServer) GetMetadataByID(context.Context, *GetMetadataRequest) (*GetMetadataResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMetadataByID not implemented")
 }
 func (UnimplementedMetadataServiceServer) PutMetadata(context.Context, *PutMetadataRequest) (*PutMetadataResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PutMetadata not implemented")
@@ -89,20 +89,20 @@ func RegisterMetadataServiceServer(s grpc.ServiceRegistrar, srv MetadataServiceS
 	s.RegisterService(&MetadataService_ServiceDesc, srv)
 }
 
-func _MetadataService_GetMetadata_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _MetadataService_GetMetadataByID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetMetadataRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MetadataServiceServer).GetMetadata(ctx, in)
+		return srv.(MetadataServiceServer).GetMetadataByID(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: MetadataService_GetMetadata_FullMethodName,
+		FullMethod: MetadataService_GetMetadataByID_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MetadataServiceServer).GetMetadata(ctx, req.(*GetMetadataRequest))
+		return srv.(MetadataServiceServer).GetMetadataByID(ctx, req.(*GetMetadataRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -133,8 +133,8 @@ var MetadataService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*MetadataServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "GetMetadata",
-			Handler:    _MetadataService_GetMetadata_Handler,
+			MethodName: "GetMetadataByID",
+			Handler:    _MetadataService_GetMetadataByID_Handler,
 		},
 		{
 			MethodName: "PutMetadata",
