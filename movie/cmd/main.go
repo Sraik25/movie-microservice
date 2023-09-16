@@ -22,7 +22,7 @@ func main() {
 	var port int
 	flag.IntVar(&port, "port", 8083, "API handler port")
 	flag.Parse()
-	log.Printf("Starting the rating service on port %d", port)
+	log.Printf("Starting the movie service on port %d", port)
 	registry, err := consul.NewRegistry("localhost:8500")
 	if err != nil {
 		panic(err)
