@@ -2,17 +2,19 @@ package main
 
 import (
 	"context"
-	"flag"
 	"fmt"
-	"google.golang.org/grpc"
 	"log"
-	"movieexample.com/gen"
-	grpcHandler "movieexample.com/metadata/internal/handler/grpc"
-	"movieexample.com/metadata/internal/repository/mysql"
 	"net"
+	"os"
 	"time"
 
+	"google.golang.org/grpc"
+	"gopkg.in/yaml.v3"
+
+	"movieexample.com/gen"
 	"movieexample.com/metadata/internal/controller/metadata"
+	grpcHandler "movieexample.com/metadata/internal/handler/grpc"
+	"movieexample.com/metadata/internal/repository/mysql"
 	"movieexample.com/pkg/discovery"
 	"movieexample.com/pkg/discovery/consul"
 )
@@ -20,9 +22,15 @@ import (
 const serviceName = "metadata"
 
 func main() {
-	var port int
-	flag.IntVar(&port, "port", 8081, "API handler port")
-	flag.Parse()
+	f, err := os.Open("base.yaml")
+	if err != nil {
+		panic(err)
+	}
+	var cfg config
+	if err = yaml.NewDecoder(f).Decode(&cfg); err != nil {
+		panic(err)
+	}
+	port := cfg.API.Port
 	log.Printf("Starting the metadata service on port %d", port)
 	registry, err := consul.NewRegistry("localhost:8500")
 	if err != nil {
@@ -42,7 +50,6 @@ func main() {
 		}
 	}()
 	defer registry.Deregister(ctx, instanceID, serviceName)
-	//repo := memory.New()
 	repo, err := mysql.New()
 	if err != nil {
 		panic(err)
@@ -56,5 +63,7 @@ func main() {
 
 	srv := grpc.NewServer()
 	gen.RegisterMetadataServiceServer(srv, h)
-	srv.Serve(lis)
+	if err = srv.Serve(lis); err != nil {
+		panic(err)
+	}
 }
