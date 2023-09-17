@@ -10,12 +10,13 @@ import (
 	ratingmodel "movieexample.com/rating/pkg/model"
 )
 
+// ErrNotFound is returned when the movie metadata is not found.
 var ErrNotFound = errors.New("movie metadata not found")
 
 type ratingGateway interface {
 	GetAggregatedRating(ctx context.Context, recordID ratingmodel.RecordID, recordType ratingmodel.RecordType) (float64, error)
-	PutRating(ctx context.Context, recordID ratingmodel.RecordID, recordType ratingmodel.RecordType, rating *ratingmodel.Rating) error
 }
+
 type metadataGateway interface {
 	Get(ctx context.Context, id string) (*metadatamodel.Metadata, error)
 }
@@ -31,6 +32,7 @@ func New(ratingGateway ratingGateway, metadataGateway metadataGateway) *Controll
 	return &Controller{ratingGateway, metadataGateway}
 }
 
+// Get returns the movie details including the aggregated rating and movie metadata.
 func (c *Controller) Get(ctx context.Context, id string) (*model.MovieDetails, error) {
 	metadata, err := c.metadataGateway.Get(ctx, id)
 	if err != nil && errors.Is(err, gateway.ErrNotFound) {
