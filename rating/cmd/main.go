@@ -2,29 +2,36 @@ package main
 
 import (
 	"context"
-	"flag"
 	"fmt"
 	"log"
-	"movieexample.com/rating/internal/repository/mysql"
 	"net"
+	"os"
 	"time"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
+	"gopkg.in/yaml.v3"
 
 	"movieexample.com/gen"
 	"movieexample.com/pkg/discovery"
 	"movieexample.com/pkg/discovery/consul"
 	"movieexample.com/rating/internal/controller/rating"
 	grpchandler "movieexample.com/rating/internal/handler/grpc"
+	"movieexample.com/rating/internal/repository/mysql"
 )
 
 const serviceName = "rating"
 
 func main() {
-	var port int
-	flag.IntVar(&port, "port", 8082, "API handler port")
-	flag.Parse()
+	f, err := os.Open("base.yaml")
+	if err != nil {
+		panic(err)
+	}
+	var cfg config
+	if err = yaml.NewDecoder(f).Decode(&cfg); err != nil {
+		panic(err)
+	}
+	port := cfg.API.Port
 	log.Printf("Starting the rating service on port %d", port)
 	registry, err := consul.NewRegistry("localhost:8500")
 	if err != nil {
