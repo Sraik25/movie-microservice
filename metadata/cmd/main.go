@@ -8,11 +8,11 @@ import (
 	"log"
 	"movieexample.com/gen"
 	grpcHandler "movieexample.com/metadata/internal/handler/grpc"
+	"movieexample.com/metadata/internal/repository/mysql"
 	"net"
 	"time"
 
 	"movieexample.com/metadata/internal/controller/metadata"
-	"movieexample.com/metadata/internal/repository/memory"
 	"movieexample.com/pkg/discovery"
 	"movieexample.com/pkg/discovery/consul"
 )
@@ -42,9 +42,12 @@ func main() {
 		}
 	}()
 	defer registry.Deregister(ctx, instanceID, serviceName)
-	repo := memory.New()
+	//repo := memory.New()
+	repo, err := mysql.New()
+	if err != nil {
+		panic(err)
+	}
 	ctrl := metadata.New(repo)
-
 	h := grpcHandler.New(ctrl)
 	lis, err := net.Listen("tcp", "localhost:8081")
 	if err != nil {
@@ -54,11 +57,4 @@ func main() {
 	srv := grpc.NewServer()
 	gen.RegisterMetadataServiceServer(srv, h)
 	srv.Serve(lis)
-
-	/*h := httphandler.New(ctrl)
-	http.Handle("/metadata", http.HandlerFunc(h.GetMetadata))
-	if err = http.ListenAndServe(fmt.Sprintf(":%d", port), nil); err != nil {
-		panic(err)
-	}*/
-
 }

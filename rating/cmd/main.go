@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"movieexample.com/rating/internal/repository/mysql"
 	"net"
 	"time"
 
@@ -16,7 +17,6 @@ import (
 	"movieexample.com/pkg/discovery/consul"
 	"movieexample.com/rating/internal/controller/rating"
 	grpchandler "movieexample.com/rating/internal/handler/grpc"
-	"movieexample.com/rating/internal/repository/memory"
 )
 
 const serviceName = "rating"
@@ -44,7 +44,11 @@ func main() {
 		}
 	}()
 	defer registry.Deregister(ctx, instanceID, serviceName)
-	repo := memory.New()
+	//repo := memory.New()
+	repo, err := mysql.New()
+	if err != nil {
+		panic(err)
+	}
 	ctrl := rating.New(repo, nil)
 	h := grpchandler.New(ctrl)
 	lis, err := net.Listen("tcp", fmt.Sprintf("localhost:%v", port))
